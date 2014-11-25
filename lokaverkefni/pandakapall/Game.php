@@ -3,11 +3,9 @@ class Game{
 	protected $hand;
 	protected $handhistory = array();
 	protected $deck;
-	protected $deckhistory = array();
 	protected $score;
 	protected $scorehistory = array();
 	protected $undo_punishment;
-	public $victory;
 
 	public function __construct(){
 		$this->newGame();
@@ -43,8 +41,8 @@ class Game{
 
 	public function removeFour($index){
 		if($this->checkFour($index)){
+			$this->gamehistory();
 			for($i=0;$i < 4; $i++){ 
-				$this->gamehistory();
 				unset($this->hand[$index+$i]);
 			}
 			$this->hand = array_values($this->hand);
@@ -89,29 +87,37 @@ class Game{
 	public function undo(){
 		if(sizeof($this->handhistory) > 0){
 			$lasthand = array_pop($this->handhistory);
-			$lastdeck = array_pop($this->deckhistory);
 			$lastscore = array_pop($this->scorehistory) - $this->undo_punishment;
-			// if(sizeof($this->hand) - sizeof($lasthand) == 1){
-			// 	$this->deck->putBack(array_pop($this->hand));
-			// }
+			if(sizeof($this->hand) - sizeof($lasthand) == 1 && !$this->isDeckEmpty()){
+				$this->deck->putBack(array_pop($this->hand));
+			}
 			$this->hand = $lasthand;
-			$this->deck = $lastdeck;
 			$this->score = $lastscore;
 			$this->undo_punishment += 2;
 		}
 	}
 
+	public function hint(){
+		}
+	}
+
 	public function gamehistory(){
 		$this->handhistory[] = $this->hand;
-		$this->deckhistory[] = $this->deck;
 		$this->scorehistory[] = $this->score;
 	}
 
-	//public function moveLast(){}
+	public function moveLast(){
+		$this->gamehistory();
+		$last = array(array_pop($this->hand));
+		$this->hand = array_merge($last, $this->hand);
+	}
+
+	public function isDeckEmpty(){
+		return $this->deck->isEmpty();
+	}
 
 	public function isWin(){
 		if(sizeof($this->hand) <= 2){
-			$victory = True;
 			return True;
 		}
 		return False;

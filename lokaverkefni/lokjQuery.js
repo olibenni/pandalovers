@@ -29,6 +29,10 @@ $(document).ready(function() {
     $("#undo").click(function() {
 		undo();
 	});
+
+	$(window).on("load" ,function(){
+        refresh();
+    });
 });
 
 function contactMe() {
@@ -93,24 +97,15 @@ function stickyNav() {
 }
 
 function pandaNewGame() {
-	// var newGame = true;
-
 	$.ajax({
 		type: "POST",
 		url: "pandakapall/playGame.php",
 		data: {new: true},
 		success: function(data) {
-			// alert(data);
-			console.log("hallo");
             console.log("Starting new game");
 			$("#newGame").html(data);
-			// $("#playWindow").append(data);
-			// $("").append(data);
-			
 		}
 	});
-
-	// return false;
 }
 
 function drawCard() {
@@ -120,11 +115,28 @@ function drawCard() {
 		data: {draw: true},
 		success: function(data) {
 			console.log("Drawing 1 card");
-			// $(".cards").hide();
 			$("#newGame").html(data);
 		}
 	});
 }
+
+function cardclicked($index) {
+	console.log(""+$index);
+	$.ajax({
+		type: "POST",
+		url: "pandakapall/playGame.php",
+		data: 
+        {
+            clickedcard: true,
+            card:$index,
+        },
+		success: function(data) {
+			console.log("card clicked");
+			$("#newGame").html(data);
+		}
+	});
+}
+
 function undo() {
 	$.ajax({
 		type: "POST",
@@ -132,7 +144,29 @@ function undo() {
 		data: {undo: true},
 		success: function(data) {
 			console.log("undo");
-			// $(".cards").hide();
+			$("#newGame").html(data);
+		}
+	});
+}
+
+function moveLast() {
+	$.ajax({
+		type: "POST",
+		url: "pandakapall/playGame.php",
+		data: {lastfirst: true},
+		success: function(data) {
+			console.log("move last card to the front");
+			$("#newGame").html(data);
+		}
+	});
+}
+
+function refresh() {
+	$.ajax({
+		type: "POST",
+		url: "pandakapall/playGame.php",
+		data: {load: true},
+		success: function(data) {
 			$("#newGame").html(data);
 		}
 	});
